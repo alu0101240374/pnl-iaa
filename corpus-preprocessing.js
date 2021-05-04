@@ -5,7 +5,7 @@ let fs = require('fs');
 
 const PATH = './ecom-train.csv';
 const TRAIN_PATH = './train.csv';
-const DEST_PATH = './vocabulary.txt';
+const DEST_PATH = './preprocessed-corpus.txt';
 const RESERVEDWORDS = ['a', 'able', 'about', 'across', 'after', 'all', 'almost', 'also', 'am', 'among',
 'an', 'and', 'any', 'are', 'as', 'at', 'be', 'because', 'been', 'but', 'by', 'can', 'cannot',
 'could','dear','did','do','does','either','else','ever','every','from','get','got','had','has',
@@ -21,29 +21,27 @@ const NUMBER = /.*\d+.*/;
 const URL = /^com$|^io$|^net$|^org$/;
 const LINK = /(.+(\.eu|\.org|\.com|\.es|\.io|\.net|<\/|\.in|\.co).*)|^http.*|.*www.*/g;
 
-let data = fs.readFileSync(PATH, {encoding: 'utf8'}, function(err) {
+let data = fs.readFileSync(TRAIN_PATH, {encoding: 'utf8'}, function(err) {
   if (err) {
     throw new Error('Unable to read file');
   }
 });
-// data = data.split(/\.$|\s|[\-,?!/():;&"']/);
-data = data.split(/\s/);
-for (let i = 0; i < data.length; i++) {
-  data[i] = data[i].replace(LINK, '');
-}
-data = data.join();
-data = data.split(/[^a-zA-Z0-9]/);
 let vocabulary = [];
-let dictionary = {};
-for (let word of data) {
-  word = word.toLowerCase();
-  if (word === '') continue;
-  if (RESERVEDWORDS.find(function(element) { return element == word; })) continue;
-  if (NUMBER.test(word)) continue;
-  if (URL.test(word)) continue;
-  if (dictionary.hasOwnProperty(word)) continue;
-  else  { 
-    dictionary[word] = null;
+// data = data.split(/\.$|\s|[\-,?!/():;&"']/);
+data = data.split(/\r?\n/);
+for (let line of data) {
+  line = line.split(/\s/);
+  for (let i = 0; i < line.length; i++) {
+    line[i] = line[i].replace(LINK, '');
+  }
+  line = line.join();
+  line  = line.split(/[^a-zA-Z0-9]/);
+  for (let word of line) {
+    word = word.toLowerCase();
+    if (word === '') continue;
+    if (RESERVEDWORDS.find(function(element) { return element == word; })) continue;
+    if (NUMBER.test(word)) continue;
+    if (URL.test(word)) continue;
     vocabulary.push(word);
   }
 }
