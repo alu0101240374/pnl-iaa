@@ -21,14 +21,32 @@ const NUMBER = /.*\d+.*/;
 const URL = /^com$|^io$|^net$|^org$/;
 const LINK = /(.+(\.eu|\.org|\.com|\.es|\.io|\.net|<\/|\.in|\.co).*)|^http.*|.*www.*/g;
 
-let data = fs.readFileSync(TRAIN_PATH, {encoding: 'utf8'}, function(err) {
+const CLASSES = {
+  'Electronics': 0,
+  'Books': 1,
+  'Clothing': 2,
+  'Household': 3
+};
+
+let data = fs.readFileSync(PATH, {encoding: 'utf8'}, function(err) {
   if (err) {
     throw new Error('Unable to read file');
   }
 });
-let vocabulary = [];
-// data = data.split(/\.$|\s|[\-,?!/():;&"']/);
+
+let processedCorpus = [];
+let counter = {};
+let category;
+
+let classesCounter = [];
+
+for (let key in CLASSES) {
+  let newCounter = {};
+  classesCounter.push(newCounter);
+}
+
 data = data.split(/\r?\n/);
+let lineNumber = data.length;
 for (let line of data) {
   line = line.split(/\s/);
   for (let i = 0; i < line.length; i++) {
@@ -36,19 +54,28 @@ for (let line of data) {
   }
   line = line.join();
   line  = line.split(/[^a-zA-Z0-9]/);
+  category = line[0];
   for (let word of line) {
     word = word.toLowerCase();
     if (word === '') continue;
     if (RESERVEDWORDS.find(function(element) { return element == word; })) continue;
     if (NUMBER.test(word)) continue;
     if (URL.test(word)) continue;
-    vocabulary.push(word);
+    let wordObject;
+    if (CLASSES.hasOwnProperty(category)) {     // significa que la categoria existe
+      wordObject = {'word': word, 'category': category};
+    } else {
+      wordObject = {'word': word, 'category': 'uknown'};
+    }
+    processedCorpus.push(wordObject);
   }
 }
-vocabulary = vocabulary.sort();
+processedCorpus = processedCorpus.sort(function(a, b) {
+  return a['word'].localeCompare(b['word']);
+});
 
-let finalVocab = `Number of words: ${vocabulary.length}\n`;
-for (let word of vocabulary) {
-  finalVocab += word + '\n';
+let finalVocab = `Number of words: ${processedCorpus.length}\n`;
+for (let object of processedCorpus) {
+  finalVocab += object['word'] + ' ' + object['category'] + '\n';
 }
 fs.writeFileSync(DEST_PATH, finalVocab);
