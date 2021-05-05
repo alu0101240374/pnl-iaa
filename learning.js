@@ -21,47 +21,46 @@ let data = fs.readFileSync(PATH, {encoding: 'utf8'}, function(err) {
   }
 });
 
-let vocabulary = [];
-let counter = {};
+let vocabulary = fs.readFileSync('vocabulary.txt', {encoding: 'utf8'}, function(err) {
+  if (err) {
+    throw new Error('Unable to read file');
+  }
+});
+vocabulary = vocabulary.split('\n');
 let category;
 
-let classesCounter = [];
+let classCounter = [];
 
 for (let key in CLASSES) {
-  let newCounter = {lines: 0};
-  classesCounter.push(newCounter);
+  let newCounter = {numberOfLines: 0, numberOfWords: 0};
+  classCounter.push(newCounter);
+}
+
+for (let word of vocabulary) {
+  for (let counter of classCounter) {
+    counter[word] = 0;
+  }
 }
 
 data = data.split(/\r?\n/);
 for (let i = 0; i < Object.keys(CLASSES).length; i++) {
   let line = data[i + 1].split(/\s/);
-  classesCounter[CLASSES[line[0]]].lines = line[1];
+  classCounter[CLASSES[line[0]]].numberOfLines = line[1];
 }
-// console.log(data[2])
-// data = data.splice(1, Object.keys(CLASSES).length - 1);
 
 for (let line of data) {
   line = line.split(/\s/);
   category = line[1];
   if (CLASSES.hasOwnProperty(category)) {     // significa que la categoria existe
-    if (classesCounter[CLASSES[category]].hasOwnProperty(line[0])) {
-      classesCounter[CLASSES[category]][line[0]] += 1;
-    } else {
-      classesCounter[CLASSES[category]][line[0]] = 1;
+    if (classCounter[CLASSES[category]].hasOwnProperty(line[0])) {
+      classCounter[CLASSES[category]]['numberOfWords'] += 1;
+      classCounter[CLASSES[category]][line[0]] += 1;
     }
-  }
-  if (counter.hasOwnProperty(line[0])) {
-    counter[line[0]] += 1;
-  } else  {
-    counter[line[0]] = 1;
-    vocabulary.push(line[0]);
   }
 }
 
-vocabulary = vocabulary.sort();
-
 for (let key in CLASSES) {
-  writeOnFile('aprendizaje' + key[0] + '.txt', vocabulary, classesCounter[CLASSES[key]].lines, classesCounter[CLASSES[key]], Object.keys(classesCounter[CLASSES[key]]).length);
+  writeOnFile('aprendizaje' + key[0] + '.txt', vocabulary, classCounter[CLASSES[key]].numberOfLines, classCounter[CLASSES[key]], classCounter[CLASSES[key]].numberOfWords);
 }
 
 function countertoString(vocabulary, lineNumber, classCounter, wordNumber) { // en esta función imprimiremos un fichero de aprendizaje 
@@ -83,8 +82,9 @@ function writeOnFile(fileName, vocabulary, lineNumber, classCounter, wordNumber)
 }
 
 function computeProb(vocabularySize, frequency, wordNumber) {
-  let prob = 0;
   let numerator = frequency + 1;
-  let denominator = wordNumber + vocabularySize;
+  let denominator = Number(wordNumber) + Number(vocabularySize);
+  // console.log(numerator)
+  // console.log(denominator)
   return Math.log(numerator / denominator);
 }
