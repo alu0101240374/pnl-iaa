@@ -35,15 +35,15 @@ let data = fs.readFileSync(PATH, {encoding: 'utf8'}, function(err) {
 });
 
 let processedCorpus = [];
-let counter = {};
 let category;
+let categoriesLines = {      // lines
+  'Electronics': 0,
+  'Books': 0,
+  'Clothing': 0,
+  'Household': 0
+};
 
 let classesCounter = [];
-
-for (let key in CLASSES) {
-  let newCounter = {};
-  classesCounter.push(newCounter);
-}
 
 data = data.split(/\r?\n/);
 let lineNumber = data.length;
@@ -55,6 +55,9 @@ for (let line of data) {
   line = line.join();
   line  = line.split(/[^a-zA-Z0-9]/);
   category = line[0];
+  if (CLASSES.hasOwnProperty(category)) {
+    categoriesLines[category] += 1;
+  }
   for (let word of line) {
     word = word.toLowerCase();
     if (word === '') continue;
@@ -74,8 +77,12 @@ processedCorpus = processedCorpus.sort(function(a, b) {
   return a['word'].localeCompare(b['word']);
 });
 
-let finalVocab = `Number of words: ${processedCorpus.length}\n`;
+let finalVocab = `Numero de palabras: ${processedCorpus.length}\n`;
+for (let key in categoriesLines) {
+  finalVocab += `${key} ${categoriesLines[key]}\n`;  
+}
 for (let object of processedCorpus) {
   finalVocab += object['word'] + ' ' + object['category'] + '\n';
 }
+//finalVocab -= finalVocab[finalVocab.length - 1];
 fs.writeFileSync(DEST_PATH, finalVocab);
