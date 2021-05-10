@@ -1,7 +1,5 @@
 'use strict';
 
-const VOCABULARY_SIZE = process.argv[2];
-
 const { WSAECONNREFUSED } = require('constants');
 let fs = require('fs');
 
@@ -27,6 +25,8 @@ let vocabulary = fs.readFileSync('vocabulary.txt', {encoding: 'utf8'}, function(
   }
 });
 vocabulary = vocabulary.split('\n');
+const VOCABULARY_SIZE = vocabulary[0].split(/\s/)[3];
+//console.log(VOCABULARY_SIZE)
 let category;
 
 let classCounter = [];
@@ -59,6 +59,15 @@ for (let line of data) {
   }
 }
 
+for (let word of vocabulary) {
+  for (let counter of classCounter) {
+    if (counter[word] == 0) {
+      delete counter[word];
+      counter['UNK'] += 1;
+    }
+  }
+}
+
 for (let key in CLASSES) {
   writeOnFile('aprendizaje' + key[0] + '.txt', vocabulary, classCounter[CLASSES[key]].numberOfLines, classCounter[CLASSES[key]], classCounter[CLASSES[key]].numberOfWords);
 }
@@ -85,6 +94,6 @@ function computeProb(vocabularySize, frequency, wordNumber) {
   let numerator = frequency + 1;
   let denominator = Number(wordNumber) + Number(vocabularySize);
   // console.log(numerator)
-  // console.log(denominator)
+ // console.log(Number(vocabularySize))
   return Math.log(numerator / denominator);
 }
