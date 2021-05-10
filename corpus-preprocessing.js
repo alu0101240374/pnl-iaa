@@ -1,11 +1,13 @@
+// node corpus-preprocessing.js ecom-train.csv preprocessed-corpus-test.txt 
+
 'use strict';
 
 const { WSAECONNREFUSED } = require('constants');
 let fs = require('fs');
 
-const PATH = './ecom-train.csv';
+const PATH = process.argv[2]
 const TRAIN_PATH = './train.csv';
-const DEST_PATH = './preprocessed-corpus.txt';
+const DEST_PATH = process.argv[3];
 const RESERVEDWORDS = ['a', 'able', 'about', 'across', 'after', 'all', 'almost', 'also', 'am', 'among',
 'an', 'and', 'any', 'are', 'as', 'at', 'be', 'because', 'been', 'but', 'by', 'can', 'cannot',
 'could','dear','did','do','does','either','else','ever','every','from','get','got','had','has',
@@ -66,9 +68,9 @@ for (let line of data) {
     if (URL.test(word)) continue;
     let wordObject;
     if (CLASSES.hasOwnProperty(category)) {     // significa que la categoria existe
-      wordObject = {'word': word, 'category': category};
+        wordObject = {'word': word, 'category': category};
     } else {
-      wordObject = {'word': word, 'category': 'uknown'};
+      wordObject = {'word': word, 'category': 'unknown'};
     }
     processedCorpus.push(wordObject);
   }

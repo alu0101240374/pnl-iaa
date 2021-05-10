@@ -62,8 +62,10 @@ for (let line of data) {
 for (let word of vocabulary) {
   for (let counter of classCounter) {
     if (counter[word] == 0) {
-      delete counter[word];
-      counter['UNK'] += 1;
+      if (word !== 'UNK') {
+        delete counter[word];
+      }
+      //counter['UNK'] += 1;
     }
   }
 }
