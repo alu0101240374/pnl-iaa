@@ -4,7 +4,7 @@ node vocabulary-generator.js ../train.csv
 node corpus-preprocessing.js ../train.csv ../preprocessed-corpus.txt  
 node learning.js ../preprocessed-corpus.txt  
 
-test:  
+test: 
 node preprocess-corpus-test.js ../test.csv ../test.txt  
 node classify.js ../test.txt  
 node check-accuracy.js ../ecom-train.csv ../resumen_alu0101240374.csv   
