@@ -45,11 +45,13 @@ for (let word of vocabulary) {
   }
 }
 
+let totalDocuments = 0;
 data = data.split(/\r?\n/);
 for (let i = 0; i < Object.keys(CLASSES).length; i++) {
   let line = data[i + 1].split(/\s/);
   classCounter[CLASSES[line[0]]].numberOfLines = line[1];
 }
+
 
 for (let line of data) {
   line = line.split(/\s/);
@@ -73,7 +75,8 @@ for (let word of vocabulary) {
 }
 
 for (let key in CLASSES) {
-  writeOnFile('../aprendizaje' + key[0] + '.txt', vocabulary, classCounter[CLASSES[key]].numberOfLines, classCounter[CLASSES[key]], classCounter[CLASSES[key]].numberOfWords);
+  const CLASS_FREQUENCY = classCounter[CLASSES[key].numberOfLines]
+  writeOnFile('../aprendizaje' + key[0] + '.txt', vocabulary, classCounter[CLASSES[key]].numberOfLines, classCounter[CLASSES[key]], classCounter[CLASSES[key]].numberOfWords, totalDocuments);
 }
 
 function countertoString(vocabulary, lineNumber, classCounter, wordNumber) { // en esta función imprimiremos un fichero de aprendizaje 
@@ -94,7 +97,7 @@ function writeOnFile(fileName, vocabulary, lineNumber, classCounter, wordNumber)
   fs.writeFileSync(fileName, finalString);
 }
 
-function computeProb(vocabularySize, frequency, wordNumber) {
+function computeProb(vocabularySize, frequency, wordNumber, classFrequency) {
   let numerator = frequency + 1;
   let denominator = Number(wordNumber) + Number(vocabularySize);
   return Math.log(numerator / denominator);
