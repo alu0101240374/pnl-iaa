@@ -30,7 +30,7 @@ La parte más importante en mi opinión es la utilización de diccionarios para 
 
 ## Error sobre el corpus de entrenamiento
 
-Para comprobar la efectividad se dividió el corpus de entrenamiento en un 70% para entrenar, y un 30% para test. El resultado fue de un 93.98% de acierto.  
+Para comprobar la efectividad se dividió el corpus de entrenamiento en un 70% para entrenar, y un 30% para test. El resultado fue de un 93.98% de acierto, es decir, un 6,02% de error.
 
 ## Programas y ficheros pedidos
 
